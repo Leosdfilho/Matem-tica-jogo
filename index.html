@@ -411,9 +411,10 @@
 
         <div class="difficulty-selector" id="difficultySelector">
             <div class="difficulty-label">Escolha o Nível de Dificuldade:</div>
-            <button class="button difficulty-btn" onclick="startGame('expert')">Expert (12-99)</button>
-            <button class="button difficulty-btn" onclick="startGame('insane')">Insano (25-199)</button>
-            <button class="button difficulty-btn" onclick="startGame('nightmare')">Pesadelo (50-999)</button>
+            <button class="button difficulty-btn" onclick="startGame('easy')">Fácil (2-12)</button>
+            <button class="button difficulty-btn" onclick="startGame('medium')">Médio (5-25)</button>
+            <button class="button difficulty-btn" onclick="startGame('hard')">Difícil (12-99)</button>
+            <button class="button difficulty-btn" onclick="startGame('expert')">Expert (25-199)</button>
         </div>
 
         <div class="question-container" id="questionContainer" style="display: none;">
@@ -446,7 +447,7 @@
         let correct = 0;
         let currentQuestionNumber = 0;
         let totalQuestions = 10;
-        let difficulty = 'expert';
+        let difficulty = 'easy';
         let gameStarted = false;
         let gameEnded = false;
         let startTime = 0;
@@ -454,23 +455,29 @@
         let questionStartTime = 0;
 
         const difficultySettings = {
-            expert: { 
+            easy: { 
+                min: 2, 
+                max: 12,
+                name: 'Fácil',
+                timeBonus: 10
+            },
+            medium: { 
+                min: 5, 
+                max: 25,
+                name: 'Médio',
+                timeBonus: 15
+            },
+            hard: { 
                 min: 12, 
                 max: 99,
-                name: 'Expert',
+                name: 'Difícil',
                 timeBonus: 20
             },
-            insane: { 
+            expert: { 
                 min: 25, 
                 max: 199,
-                name: 'Insano',
+                name: 'Expert',
                 timeBonus: 30
-            },
-            nightmare: { 
-                min: 50, 
-                max: 999,
-                name: 'Pesadelo',
-                timeBonus: 50
             }
         };
 
@@ -525,12 +532,26 @@
             
             let num1, num2;
             
-            if (difficulty === 'expert') {
-                // Números de 12-99 com foco em multiplicações mais complexas
+            if (difficulty === 'easy') {
+                // Números de 2-12 - nível iniciante
+                num1 = Math.floor(Math.random() * 11) + 2;
+                num2 = Math.floor(Math.random() * 11) + 2;
+            } else if (difficulty === 'medium') {
+                // Números de 5-25 - nível intermediário
+                num1 = Math.floor(Math.random() * 21) + 5;
+                num2 = Math.floor(Math.random() * 21) + 5;
+            } else if (difficulty === 'hard') {
+                // Números de 12-99 - nível avançado
                 num1 = Math.floor(Math.random() * 88) + 12;
                 num2 = Math.floor(Math.random() * 88) + 12;
-            } else if (difficulty === 'insane') {
-                // Números de 25-199 com possibilidade de números maiores
+                
+                // 20% chance de números menores para equilibrar
+                if (Math.random() < 0.2) {
+                    num1 = Math.floor(Math.random() * 50) + 12;
+                    num2 = Math.floor(Math.random() * 20) + 5;
+                }
+            } else if (difficulty === 'expert') {
+                // Números de 25-199 - nível expert
                 num1 = Math.floor(Math.random() * 175) + 25;
                 num2 = Math.floor(Math.random() * 175) + 25;
                 
@@ -538,16 +559,6 @@
                 if (Math.random() < 0.3) {
                     num1 = Math.floor(Math.random() * 100) + 100;
                     num2 = Math.floor(Math.random() * 50) + 25;
-                }
-            } else if (difficulty === 'nightmare') {
-                // Números de 50-999 - muito difícil
-                num1 = Math.floor(Math.random() * 950) + 50;
-                num2 = Math.floor(Math.random() * 950) + 50;
-                
-                // 40% chance de números extremamente grandes
-                if (Math.random() < 0.4) {
-                    num1 = Math.floor(Math.random() * 500) + 500;
-                    num2 = Math.floor(Math.random() * 100) + 50;
                 }
             }
             
@@ -585,7 +596,7 @@
                 // Sistema de pontuação baseado em dificuldade e tempo
                 let basePoints = difficultySettings[difficulty].timeBonus;
                 let timeBonus = Math.max(0, Math.floor((10 - questionTime) * 5));
-                let difficultyMultiplier = difficulty === 'expert' ? 1 : difficulty === 'insane' ? 2 : 3;
+                let difficultyMultiplier = difficulty === 'easy' ? 1 : difficulty === 'medium' ? 1.5 : difficulty === 'hard' ? 2 : 3;
                 
                 let questionScore = (basePoints + timeBonus) * difficultyMultiplier;
                 score += questionScore;
@@ -625,12 +636,4 @@
             clearInterval(timerInterval);
             
             const totalTime = Math.floor((Date.now() - startTime) / 1000);
-            const minutes = Math.floor(totalTime / 60);
-            const seconds = totalTime % 60;
-            
-            document.getElementById('questionContainer').style.display = 'none';
-            document.getElementById('inputContainer').style.display = 'none';
-            document.getElementById('gameButtons').style.display = 'none';
-            
-            const gameOverEl = document.getElementById('gameOver');
-            const titleEl = document.getElement
+            const minutes = Math.floor(totalTime / 60)
