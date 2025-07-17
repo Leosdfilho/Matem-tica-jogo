@@ -25,7 +25,7 @@
             background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
             padding: 40px;
-            max-width: 700px;
+            max-width: 600px;
             width: 100%;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
@@ -70,9 +70,8 @@
         }
 
         .score-board {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 10px;
+            display: flex;
+            justify-content: space-between;
             margin-bottom: 30px;
             padding: 15px;
             background: linear-gradient(45deg, #f7fafc, #edf2f7);
@@ -82,7 +81,6 @@
 
         .score-item {
             text-align: center;
-            padding: 5px;
         }
 
         .score-label {
@@ -95,48 +93,6 @@
             font-size: 1.5em;
             font-weight: bold;
             color: #4a5568;
-        }
-
-        .timer-container {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: linear-gradient(45deg, #2d3748, #4a5568);
-            border-radius: 15px;
-            color: white;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-        }
-
-        .timer-item {
-            text-align: center;
-        }
-
-        .timer-label {
-            font-size: 0.9em;
-            color: #cbd5e0;
-            margin-bottom: 5px;
-        }
-
-        .timer-value {
-            font-size: 1.8em;
-            font-weight: bold;
-            color: #90cdf4;
-            font-family: 'Courier New', monospace;
-        }
-
-        .question-timer {
-            color: #fbb6ce;
-        }
-
-        .question-timer.urgent {
-            color: #fed7d7;
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
         }
 
         .question-container {
@@ -262,18 +218,6 @@
             box-shadow: 0 5px 15px rgba(237, 137, 54, 0.4);
         }
 
-        .reset-btn {
-            background: linear-gradient(45deg, #e53e3e, #c53030);
-            color: white;
-            padding: 10px 20px;
-            font-size: 1em;
-        }
-
-        .reset-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(229, 62, 62, 0.4);
-        }
-
         .feedback {
             margin-top: 20px;
             padding: 15px;
@@ -350,10 +294,6 @@
             font-weight: bold;
         }
 
-        .controls {
-            margin-top: 20px;
-        }
-
         @media (max-width: 600px) {
             .game-container {
                 padding: 20px;
@@ -371,15 +311,6 @@
                 width: 160px;
                 font-size: 1.3em;
             }
-
-            .score-board {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .timer-container {
-                flex-direction: column;
-                gap: 10px;
-            }
         }
     </style>
 </head>
@@ -388,21 +319,6 @@
         <div class="header">
             <h1 class="title">🔢 jogo de multiplicação</h1>
             <p class="subtitle">Pratique multiplicação de forma divertida!</p>
-        </div>
-
-        <div class="timer-container">
-            <div class="timer-item">
-                <div class="timer-label">⏰ Tempo Total</div>
-                <div class="timer-value" id="totalTime">00:00</div>
-            </div>
-            <div class="timer-item">
-                <div class="timer-label">⏱️ Tempo da Pergunta</div>
-                <div class="timer-value question-timer" id="questionTime">00:00</div>
-            </div>
-            <div class="timer-item">
-                <div class="timer-label">🏆 Melhor Tempo</div>
-                <div class="timer-value" id="bestTime">--:--</div>
-            </div>
         </div>
 
         <div class="score-board">
@@ -421,10 +337,6 @@
             <div class="score-item">
                 <div class="score-label">Sequência</div>
                 <div class="score-value" id="streak">0</div>
-            </div>
-            <div class="score-item">
-                <div class="score-label">Média/Pergunta</div>
-                <div class="score-value" id="averageTime">--:--</div>
             </div>
         </div>
 
@@ -448,10 +360,6 @@
             <button class="button next-btn hidden" id="nextBtn" onclick="nextQuestion()">Próxima Pergunta</button>
         </div>
 
-        <div class="controls">
-            <button class="button reset-btn" onclick="resetGame()">🔄 Reiniciar Jogo</button>
-        </div>
-
         <div class="feedback" id="feedback"></div>
     </div>
 
@@ -467,93 +375,17 @@
         let difficulty = 'medium';
         let gameStarted = false;
 
-        // Timer variables
-        let gameStartTime = null;
-        let questionStartTime = null;
-        let totalGameInterval = null;
-        let questionInterval = null;
-        let questionTimes = [];
-        let bestQuestionTime = null;
-
         const difficultySettings = {
             easy: { min: 2, max: 12 },
             medium: { min: 3, max: 25 },
             hard: { min: 6, max: 50 }
         };
 
-        function formatTime(seconds) {
-            const mins = Math.floor(seconds / 60);
-            const secs = seconds % 60;
-            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        }
-
-        function startGameTimer() {
-            if (!gameStartTime) {
-                gameStartTime = Date.now();
-                totalGameInterval = setInterval(() => {
-                    const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
-                    document.getElementById('totalTime').textContent = formatTime(elapsed);
-                }, 1000);
-            }
-        }
-
-        function startQuestionTimer() {
-            questionStartTime = Date.now();
-            clearInterval(questionInterval);
-            
-            questionInterval = setInterval(() => {
-                const elapsed = Math.floor((Date.now() - questionStartTime) / 1000);
-                const timeElement = document.getElementById('questionTime');
-                timeElement.textContent = formatTime(elapsed);
-                
-                // Adiciona classe "urgent" se demorar mais que 30 segundos
-                if (elapsed > 30) {
-                    timeElement.classList.add('urgent');
-                } else {
-                    timeElement.classList.remove('urgent');
-                }
-            }, 1000);
-        }
-
-        function stopQuestionTimer() {
-            clearInterval(questionInterval);
-            const elapsed = Math.floor((Date.now() - questionStartTime) / 1000);
-            questionTimes.push(elapsed);
-            
-            // Atualiza melhor tempo
-            if (!bestQuestionTime || elapsed < bestQuestionTime) {
-                bestQuestionTime = elapsed;
-                document.getElementById('bestTime').textContent = formatTime(bestQuestionTime);
-            }
-            
-            // Atualiza tempo médio
-            const average = Math.floor(questionTimes.reduce((a, b) => a + b, 0) / questionTimes.length);
-            document.getElementById('averageTime').textContent = formatTime(average);
-            
-            document.getElementById('questionTime').classList.remove('urgent');
-        }
-
-        function resetTimers() {
-            clearInterval(totalGameInterval);
-            clearInterval(questionInterval);
-            gameStartTime = null;
-            questionStartTime = null;
-            questionTimes = [];
-            bestQuestionTime = null;
-            
-            document.getElementById('totalTime').textContent = '00:00';
-            document.getElementById('questionTime').textContent = '00:00';
-            document.getElementById('bestTime').textContent = '--:--';
-            document.getElementById('averageTime').textContent = '--:--';
-            document.getElementById('questionTime').classList.remove('urgent');
-        }
-
         function setDifficulty(level) {
             difficulty = level;
             gameStarted = true;
             document.getElementById('answerInput').disabled = false;
             document.getElementById('submitBtn').disabled = false;
-            startGameTimer();
             generateQuestion();
         }
 
@@ -593,8 +425,6 @@
             document.getElementById('feedback').className = 'feedback';
             document.getElementById('submitBtn').classList.remove('hidden');
             document.getElementById('nextBtn').classList.add('hidden');
-            
-            startQuestionTimer();
         }
 
         function checkAnswer() {
@@ -607,29 +437,73 @@
                 return;
             }
 
-            stopQuestionTimer();
-            const questionTime = Math.floor((Date.now() - questionStartTime) / 1000);
-
             if (userAnswer === currentQuestion.answer) {
                 correct++;
                 streak++;
-                // Bônus por velocidade (menos tempo = mais pontos)
-                const timeBonus = Math.max(0, 30 - questionTime);
-                score += (10 + streak * 2 + timeBonus);
+                score += (10 + streak * 2); // Pontuação bônus por sequência
                 maxStreak = Math.max(maxStreak, streak);
                 
-                let timeMessage = '';
-                if (questionTime <= 5) {
-                    timeMessage = ' ⚡ Muito rápido!';
-                } else if (questionTime <= 10) {
-                    timeMessage = ' 🚀 Boa velocidade!';
-                } else if (questionTime <= 20) {
-                    timeMessage = ' 👍 Bom tempo!';
-                }
-                
-                feedbackEl.textContent = `🎉 Correto! ${currentQuestion.num1} × ${currentQuestion.num2} = ${currentQuestion.answer} (${formatTime(questionTime)})${timeMessage}`;
+                feedbackEl.textContent = `🎉 Correto! ${currentQuestion.num1} × ${currentQuestion.num2} = ${currentQuestion.answer}`;
                 feedbackEl.className = 'feedback correct';
                 
                 // Adiciona confete para acertos em sequência
                 if (streak >= 3) {
-             
+                    createConfetti();
+                }
+            } else {
+                incorrect++;
+                streak = 0;
+                
+                feedbackEl.textContent = `❌ Incorreto! ${currentQuestion.num1} × ${currentQuestion.num2} = ${currentQuestion.answer}`;
+                feedbackEl.className = 'feedback incorrect';
+            }
+
+            updateScores();
+            document.getElementById('submitBtn').classList.add('hidden');
+            document.getElementById('nextBtn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            generateQuestion();
+        }
+
+        function updateScores() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('correct').textContent = correct;
+            document.getElementById('incorrect').textContent = incorrect;
+            document.getElementById('streak').textContent = streak;
+        }
+
+        function createConfetti() {
+            const celebration = document.getElementById('celebration');
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 3 + 's';
+                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                celebration.appendChild(confetti);
+                
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+
+        // Event listeners
+        document.getElementById('answerInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !document.getElementById('submitBtn').classList.contains('hidden')) {
+                checkAnswer();
+            } else if (e.key === 'Enter' && !document.getElementById('nextBtn').classList.contains('hidden')) {
+                nextQuestion();
+            }
+        });
+
+        // Inicialização
+        document.getElementById('feedback').textContent = 'Selecione um nível de dificuldade para começar a jogar!';
+    </script>
+</body>
+</html>
