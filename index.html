@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio de Multiplicação</title>
     <style>
         * {
             margin: 0;
@@ -241,8 +242,9 @@
         .difficulty-btn {
             background: linear-gradient(45deg, #ed8936, #dd6b20);
             color: white;
-            padding: 10px 20px;
-            font-size: 1em;
+            padding: 12px 24px;
+            font-size: 1.1em;
+            margin: 8px;
         }
 
         .difficulty-btn:hover {
@@ -292,7 +294,7 @@
         .difficulty-label {
             font-size: 1.1em;
             color: #4a5568;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             font-weight: bold;
         }
 
@@ -315,8 +317,9 @@
         }
 
         .final-score {
-            font-size: 1.5em;
+            font-size: 1.3em;
             margin-bottom: 20px;
+            line-height: 1.6;
         }
 
         .celebration {
@@ -376,6 +379,12 @@
                 justify-content: space-between;
                 padding: 5px 0;
             }
+
+            .difficulty-btn {
+                display: block;
+                width: 100%;
+                margin: 5px 0;
+            }
         }
     </style>
 </head>
@@ -411,10 +420,10 @@
 
         <div class="difficulty-selector" id="difficultySelector">
             <div class="difficulty-label">Escolha o Nível de Dificuldade:</div>
-            <button class="button difficulty-btn" onclick="startGame('easy')">Fácil (2-12)</button>
-            <button class="button difficulty-btn" onclick="startGame('medium')">Médio (5-25)</button>
-            <button class="button difficulty-btn" onclick="startGame('hard')">Difícil (12-99)</button>
-            <button class="button difficulty-btn" onclick="startGame('expert')">Expert (25-199)</button>
+            <button class="button difficulty-btn" id="easyBtn">Fácil (2-12)</button>
+            <button class="button difficulty-btn" id="mediumBtn">Médio (5-25)</button>
+            <button class="button difficulty-btn" id="hardBtn">Difícil (12-99)</button>
+            <button class="button difficulty-btn" id="expertBtn">Expert (25-199)</button>
         </div>
 
         <div class="question-container" id="questionContainer" style="display: none;">
@@ -426,8 +435,8 @@
         </div>
 
         <div id="gameButtons" style="display: none;">
-            <button class="button submit-btn" id="submitBtn" onclick="checkAnswer()">Verificar</button>
-            <button class="button next-btn hidden" id="nextBtn" onclick="nextQuestion()">Próxima</button>
+            <button class="button submit-btn" id="submitBtn">Verificar</button>
+            <button class="button next-btn hidden" id="nextBtn">Próxima</button>
         </div>
 
         <div class="feedback" id="feedback">Selecione um nível de dificuldade para começar o desafio!</div>
@@ -435,13 +444,14 @@
         <div class="game-over hidden" id="gameOver">
             <h2 id="gameOverTitle">🎉 Parabéns!</h2>
             <div class="final-score" id="finalScore"></div>
-            <button class="button restart-btn" onclick="restartGame()">Jogar Novamente</button>
+            <button class="button restart-btn" id="restartBtn">Jogar Novamente</button>
         </div>
     </div>
 
     <div class="celebration" id="celebration"></div>
 
     <script>
+        // Variáveis do jogo
         let currentQuestion = {};
         let score = 0;
         let correct = 0;
@@ -451,9 +461,10 @@
         let gameStarted = false;
         let gameEnded = false;
         let startTime = 0;
-        let timerInterval;
+        let timerInterval = null;
         let questionStartTime = 0;
 
+        // Configurações de dificuldade
         const difficultySettings = {
             easy: { 
                 min: 2, 
@@ -481,6 +492,7 @@
             }
         };
 
+        // Função para iniciar o jogo
         function startGame(level) {
             difficulty = level;
             gameStarted = true;
@@ -490,7 +502,10 @@
             correct = 0;
             startTime = Date.now();
             
+            // Esconder seletor de dificuldade
             document.getElementById('difficultySelector').style.display = 'none';
+            
+            // Mostrar elementos do jogo
             document.getElementById('questionContainer').style.display = 'block';
             document.getElementById('inputContainer').style.display = 'block';
             document.getElementById('gameButtons').style.display = 'block';
@@ -500,7 +515,10 @@
             generateQuestion();
         }
 
+        // Função para iniciar o cronômetro
         function startTimer() {
+            if (timerInterval) clearInterval(timerInterval);
+            
             timerInterval = setInterval(() => {
                 if (!gameEnded) {
                     const elapsed = Math.floor((Date.now() - startTime) / 1000);
@@ -519,6 +537,7 @@
             }, 1000);
         }
 
+        // Função para gerar uma pergunta
         function generateQuestion() {
             if (currentQuestionNumber >= totalQuestions) {
                 endGame();
@@ -533,15 +552,12 @@
             let num1, num2;
             
             if (difficulty === 'easy') {
-                // Números de 2-12 - nível iniciante
                 num1 = Math.floor(Math.random() * 11) + 2;
                 num2 = Math.floor(Math.random() * 11) + 2;
             } else if (difficulty === 'medium') {
-                // Números de 5-25 - nível intermediário
                 num1 = Math.floor(Math.random() * 21) + 5;
                 num2 = Math.floor(Math.random() * 21) + 5;
             } else if (difficulty === 'hard') {
-                // Números de 12-99 - nível avançado
                 num1 = Math.floor(Math.random() * 88) + 12;
                 num2 = Math.floor(Math.random() * 88) + 12;
                 
@@ -551,7 +567,6 @@
                     num2 = Math.floor(Math.random() * 20) + 5;
                 }
             } else if (difficulty === 'expert') {
-                // Números de 25-199 - nível expert
                 num1 = Math.floor(Math.random() * 175) + 25;
                 num2 = Math.floor(Math.random() * 175) + 25;
                 
@@ -579,6 +594,7 @@
             updateUI();
         }
 
+        // Função para verificar a resposta
         function checkAnswer() {
             const userAnswer = parseInt(document.getElementById('answerInput').value);
             const feedbackEl = document.getElementById('feedback');
@@ -598,7 +614,7 @@
                 let timeBonus = Math.max(0, Math.floor((10 - questionTime) * 5));
                 let difficultyMultiplier = difficulty === 'easy' ? 1 : difficulty === 'medium' ? 1.5 : difficulty === 'hard' ? 2 : 3;
                 
-                let questionScore = (basePoints + timeBonus) * difficultyMultiplier;
+                let questionScore = Math.floor((basePoints + timeBonus) * difficultyMultiplier);
                 score += questionScore;
                 
                 feedbackEl.textContent = `🎉 Correto! +${questionScore} pontos (${questionTime.toFixed(1)}s)`;
@@ -618,22 +634,13 @@
             updateUI();
         }
 
+        // Função para próxima pergunta
         function nextQuestion() {
             generateQuestion();
         }
 
+        // Função para atualizar a interface
         function updateUI() {
             document.getElementById('questionNumber').textContent = `${currentQuestionNumber}/10`;
             document.getElementById('score').textContent = score;
             document.getElementById('correct').textContent = correct;
-            
-            const progress = (currentQuestionNumber / totalQuestions) * 100;
-            document.getElementById('progressFill').style.width = progress + '%';
-        }
-
-        function endGame() {
-            gameEnded = true;
-            clearInterval(timerInterval);
-            
-            const totalTime = Math.floor((Date.now() - startTime) / 1000);
-            const minutes = Math.floor(totalTime / 60)
