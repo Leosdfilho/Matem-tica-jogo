@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jogo de Multiplicação</title>
+    <title> Jogo de Multiplicação</title>
     <style>
         * {
             margin: 0;
@@ -25,7 +25,7 @@
             background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
             padding: 40px;
-            max-width: 700px;
+            max-width: 600px;
             width: 100%;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
@@ -67,50 +67,6 @@
             font-size: 1.2em;
             color: #718096;
             margin-bottom: 20px;
-        }
-
-        .game-progress {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            padding: 15px;
-            background: linear-gradient(45deg, #f7fafc, #edf2f7);
-            border-radius: 15px;
-            border: 2px solid #e2e8f0;
-        }
-
-        .progress-item {
-            text-align: center;
-            flex: 1;
-        }
-
-        .progress-label {
-            font-size: 0.9em;
-            color: #718096;
-            margin-bottom: 5px;
-        }
-
-        .progress-value {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #4a5568;
-        }
-
-        .timer {
-            font-size: 2em;
-            color: #e53e3e;
-            font-weight: bold;
-        }
-
-        .timer.warning {
-            color: #ff6b6b;
-            animation: pulse 1s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
         }
 
         .score-board {
@@ -255,22 +211,11 @@
             color: white;
             padding: 10px 20px;
             font-size: 1em;
-            margin: 2px;
         }
 
         .difficulty-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(237, 137, 54, 0.4);
-        }
-
-        .restart-btn {
-            background: linear-gradient(45deg, #e53e3e, #c53030);
-            color: white;
-        }
-
-        .restart-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(229, 62, 62, 0.4);
         }
 
         .feedback {
@@ -296,20 +241,6 @@
             background: linear-gradient(45deg, #fed7d7, #feb2b2);
             color: #742a2a;
             border: 2px solid #e53e3e;
-        }
-
-        .feedback.victory {
-            background: linear-gradient(45deg, #ffd700, #ffed4e);
-            color: #744210;
-            border: 2px solid #d69e2e;
-            font-size: 1.5em;
-        }
-
-        .feedback.defeat {
-            background: linear-gradient(45deg, #fed7d7, #feb2b2);
-            color: #742a2a;
-            border: 2px solid #e53e3e;
-            font-size: 1.5em;
         }
 
         .difficulty-selector {
@@ -356,48 +287,14 @@
             }
         }
 
-        .game-over {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+        .streak-indicator {
+            margin-top: 10px;
+            font-size: 1.1em;
+            color: #667eea;
+            font-weight: bold;
         }
 
-        .game-over-content {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            max-width: 500px;
-            width: 90%;
-        }
-
-        .game-over h2 {
-            font-size: 2.5em;
-            margin-bottom: 20px;
-            color: #4a5568;
-        }
-
-        .game-over p {
-            font-size: 1.3em;
-            margin-bottom: 15px;
-            color: #718096;
-        }
-
-        .final-stats {
-            background: #f7fafc;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-        }
-
-        @media (max-width: 700px) {
+        @media (max-width: 600px) {
             .game-container {
                 padding: 20px;
             }
@@ -414,43 +311,14 @@
                 width: 160px;
                 font-size: 1.3em;
             }
-
-            .difficulty-btn {
-                padding: 8px 16px;
-                font-size: 0.9em;
-                margin: 2px;
-            }
-
-            .game-progress {
-                flex-direction: column;
-            }
-
-            .progress-item {
-                margin-bottom: 10px;
-            }
         }
     </style>
 </head>
 <body>
     <div class="game-container">
         <div class="header">
-            <h1 class="title">🔢 Jogo de Multiplicação</h1>
-            <p class="subtitle">Responda 10 perguntas para vencer!</p>
-        </div>
-
-        <div class="game-progress">
-            <div class="progress-item">
-                <div class="progress-label">Pergunta</div>
-                <div class="progress-value" id="questionNumber">0/10</div>
-            </div>
-            <div class="progress-item">
-                <div class="progress-label">Tempo</div>
-                <div class="progress-value timer" id="timer">60</div>
-            </div>
-            <div class="progress-item">
-                <div class="progress-label">Nível</div>
-                <div class="progress-value" id="currentLevel">-</div>
-            </div>
+            <h1 class="title">🔢 jogo de multiplicação</h1>
+            <p class="subtitle">Pratique multiplicação de forma divertida!</p>
         </div>
 
         <div class="score-board">
@@ -472,12 +340,11 @@
             </div>
         </div>
 
-        <div class="difficulty-selector" id="difficultySelector">
-            <div class="difficulty-label">Escolha o Nível de Dificuldade:</div>
+        <div class="difficulty-selector">
+            <div class="difficulty-label">Nível de Dificuldade:</div>
             <button class="button difficulty-btn" onclick="setDifficulty('easy')">Fácil (2-12)</button>
             <button class="button difficulty-btn" onclick="setDifficulty('medium')">Médio (3-25)</button>
             <button class="button difficulty-btn" onclick="setDifficulty('hard')">Difícil (6-50)</button>
-            <button class="button difficulty-btn" onclick="setDifficulty('extreme')">Extremo (10-99)</button>
         </div>
 
         <div class="question-container">
@@ -491,7 +358,6 @@
         <div>
             <button class="button submit-btn" id="submitBtn" onclick="checkAnswer()" disabled>Verificar Resposta</button>
             <button class="button next-btn hidden" id="nextBtn" onclick="nextQuestion()">Próxima Pergunta</button>
-            <button class="button restart-btn hidden" id="restartBtn" onclick="restartGame()">Reiniciar Jogo</button>
         </div>
 
         <div class="feedback" id="feedback"></div>
@@ -508,101 +374,42 @@
         let maxStreak = 0;
         let difficulty = 'medium';
         let gameStarted = false;
-        let questionCount = 0;
-        let maxQuestions = 10;
-        let timeLeft = 60;
-        let timerInterval;
-        let gameEnded = false;
 
         const difficultySettings = {
-            easy: { min: 2, max: 12, name: 'Fácil', timePerQuestion: 90 },
-            medium: { min: 3, max: 25, name: 'Médio', timePerQuestion: 75 },
-            hard: { min: 6, max: 50, name: 'Difícil', timePerQuestion: 60 },
-            extreme: { min: 10, max: 99, name: 'Extremo', timePerQuestion: 45 }
+            easy: { min: 2, max: 12 },
+            medium: { min: 3, max: 25 },
+            hard: { min: 6, max: 50 }
         };
 
         function setDifficulty(level) {
             difficulty = level;
             gameStarted = true;
-            gameEnded = false;
-            questionCount = 0;
-            score = 0;
-            correct = 0;
-            incorrect = 0;
-            streak = 0;
-            timeLeft = difficultySettings[level].timePerQuestion;
-            
-            document.getElementById('currentLevel').textContent = difficultySettings[level].name;
-            document.getElementById('difficultySelector').classList.add('hidden');
             document.getElementById('answerInput').disabled = false;
             document.getElementById('submitBtn').disabled = false;
-            document.getElementById('restartBtn').classList.remove('hidden');
-            
-            updateScores();
-            startTimer();
             generateQuestion();
         }
 
-        function startTimer() {
-            const timerElement = document.getElementById('timer');
-            timerInterval = setInterval(() => {
-                timeLeft--;
-                timerElement.textContent = timeLeft;
-                
-                if (timeLeft <= 10) {
-                    timerElement.classList.add('warning');
-                } else {
-                    timerElement.classList.remove('warning');
-                }
-                
-                if (timeLeft <= 0) {
-                    endGame(false);
-                }
-            }, 1000);
-        }
-
         function generateQuestion() {
-            if (questionCount >= maxQuestions) {
-                endGame(true);
-                return;
-            }
-
-            questionCount++;
-            updateQuestionNumber();
-            
             const settings = difficultySettings[difficulty];
             
-            let num1, num2;
+            // Gera dois números aleatórios para multiplicação
+            let num1 = Math.floor(Math.random() * (settings.max - settings.min + 1)) + settings.min;
+            let num2 = Math.floor(Math.random() * (settings.max - settings.min + 1)) + settings.min;
             
-            if (difficulty === 'extreme') {
-                // Para nível extremo, números maiores e mais desafiadores
-                num1 = Math.floor(Math.random() * (settings.max - settings.min + 1)) + settings.min;
-                num2 = Math.floor(Math.random() * (settings.max - settings.min + 1)) + settings.min;
-                
-                // Ocasionalmente, um número menor para não ser impossível
-                if (Math.random() < 0.3) {
-                    num2 = Math.floor(Math.random() * 20) + 2;
-                }
-            } else if (difficulty === 'hard') {
-                num1 = Math.floor(Math.random() * (settings.max - settings.min + 1)) + settings.min;
-                num2 = Math.floor(Math.random() * (settings.max - settings.min + 1)) + settings.min;
-                
+            // Para nível difícil, adiciona chance de números de 2 dígitos maiores
+            if (difficulty === 'hard') {
                 if (Math.random() < 0.4) {
-                    num1 = Math.floor(Math.random() * 41) + 10;
-                    num2 = Math.floor(Math.random() * 21) + 6;
+                    num1 = Math.floor(Math.random() * 41) + 10; // 10-50
+                    num2 = Math.floor(Math.random() * 21) + 6;  // 6-26
                 }
-            } else if (difficulty === 'medium') {
-                num1 = Math.floor(Math.random() * (settings.max - settings.min + 1)) + settings.min;
-                num2 = Math.floor(Math.random() * (settings.max - settings.min + 1)) + settings.min;
-                
+            }
+            
+            // Para nível médio, adiciona chance de números maiores ocasionalmente
+            if (difficulty === 'medium') {
                 if (Math.random() < 0.3) {
-                    num1 = Math.floor(Math.random() * 16) + 10;
-                    num2 = Math.floor(Math.random() * 13) + 3;
+                    num1 = Math.floor(Math.random() * 16) + 10; // 10-25
+                    num2 = Math.floor(Math.random() * 13) + 3;  // 3-15
                 }
-            } else {
-                // Nível fácil
-                num1 = Math.floor(Math.random() * (settings.max - settings.min + 1)) + settings.min;
-                num2 = Math.floor(Math.random() * (settings.max - settings.min + 1)) + settings.min;
             }
             
             currentQuestion = {
@@ -621,8 +428,6 @@
         }
 
         function checkAnswer() {
-            if (gameEnded) return;
-            
             const userAnswer = parseInt(document.getElementById('answerInput').value);
             const feedbackEl = document.getElementById('feedback');
             
@@ -635,18 +440,70 @@
             if (userAnswer === currentQuestion.answer) {
                 correct++;
                 streak++;
-                
-                // Pontuação baseada no nível e tempo restante
-                let baseScore = 10;
-                if (difficulty === 'medium') baseScore = 15;
-                if (difficulty === 'hard') baseScore = 20;
-                if (difficulty === 'extreme') baseScore = 30;
-                
-                let timeBonus = Math.floor(timeLeft / 10);
-                let streakBonus = streak * 2;
-                
-                score += baseScore + timeBonus + streakBonus;
+                score += (10 + streak * 2); // Pontuação bônus por sequência
                 maxStreak = Math.max(maxStreak, streak);
                 
                 feedbackEl.textContent = `🎉 Correto! ${currentQuestion.num1} × ${currentQuestion.num2} = ${currentQuestion.answer}`;
-  
+                feedbackEl.className = 'feedback correct';
+                
+                // Adiciona confete para acertos em sequência
+                if (streak >= 3) {
+                    createConfetti();
+                }
+            } else {
+                incorrect++;
+                streak = 0;
+                
+                feedbackEl.textContent = `❌ Incorreto! ${currentQuestion.num1} × ${currentQuestion.num2} = ${currentQuestion.answer}`;
+                feedbackEl.className = 'feedback incorrect';
+            }
+
+            updateScores();
+            document.getElementById('submitBtn').classList.add('hidden');
+            document.getElementById('nextBtn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            generateQuestion();
+        }
+
+        function updateScores() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('correct').textContent = correct;
+            document.getElementById('incorrect').textContent = incorrect;
+            document.getElementById('streak').textContent = streak;
+        }
+
+        function createConfetti() {
+            const celebration = document.getElementById('celebration');
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd'];
+            
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 3 + 's';
+                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+                celebration.appendChild(confetti);
+                
+                setTimeout(() => {
+                    confetti.remove();
+                }, 5000);
+            }
+        }
+
+        // Event listeners
+        document.getElementById('answerInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !document.getElementById('submitBtn').classList.contains('hidden')) {
+                checkAnswer();
+            } else if (e.key === 'Enter' && !document.getElementById('nextBtn').classList.contains('hidden')) {
+                nextQuestion();
+            }
+        });
+
+        // Inicialização
+        document.getElementById('feedback').textContent = 'Selecione um nível de dificuldade para começar a jogar!';
+    </script>
+</body>
+</html>
