@@ -24,7 +24,7 @@
             background: rgba(255, 255, 255, 0.95);
             border-radius: 20px;
             padding: 40px;
-            max-width: 600px;
+            max-width: 700px;
             width: 100%;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             backdrop-filter: blur(10px);
@@ -68,7 +68,7 @@
             margin-bottom: 20px;
         }
 
-        .score-board {
+        .game-info {
             display: flex;
             justify-content: space-between;
             margin-bottom: 30px;
@@ -78,20 +78,53 @@
             border: 2px solid #e2e8f0;
         }
 
-        .score-item {
+        .info-item {
             text-align: center;
+            flex: 1;
         }
 
-        .score-label {
+        .info-label {
             font-size: 0.9em;
             color: #718096;
             margin-bottom: 5px;
         }
 
-        .score-value {
+        .info-value {
             font-size: 1.5em;
             font-weight: bold;
             color: #4a5568;
+        }
+
+        .timer {
+            font-size: 2em;
+            color: #e53e3e;
+            font-weight: bold;
+        }
+
+        .timer.warning {
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(45deg, #48bb78, #38a169);
+            transition: width 0.5s ease;
+            border-radius: 10px;
         }
 
         .question-container {
@@ -125,7 +158,7 @@
         }
 
         .question {
-            font-size: 2.5em;
+            font-size: 2.8em;
             font-weight: bold;
             margin-bottom: 15px;
             position: relative;
@@ -217,6 +250,16 @@
             box-shadow: 0 5px 15px rgba(237, 137, 54, 0.4);
         }
 
+        .restart-btn {
+            background: linear-gradient(45deg, #e53e3e, #c53030);
+            color: white;
+        }
+
+        .restart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(229, 62, 62, 0.4);
+        }
+
         .feedback {
             margin-top: 20px;
             padding: 15px;
@@ -257,6 +300,25 @@
             display: none;
         }
 
+        .game-over {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 15px;
+            color: white;
+            margin-top: 20px;
+        }
+
+        .game-over h2 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .final-score {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
         .celebration {
             position: fixed;
             top: 0;
@@ -286,13 +348,6 @@
             }
         }
 
-        .streak-indicator {
-            margin-top: 10px;
-            font-size: 1.1em;
-            color: #667eea;
-            font-weight: bold;
-        }
-
         @media (max-width: 600px) {
             .game-container {
                 padding: 20px;
@@ -303,12 +358,23 @@
             }
             
             .question {
-                font-size: 2em;
+                font-size: 2.2em;
             }
             
             .answer-input {
                 width: 160px;
                 font-size: 1.3em;
+            }
+
+            .game-info {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .info-item {
+                display: flex;
+                justify-content: space-between;
+                padding: 5px 0;
             }
         }
     </style>
@@ -316,50 +382,60 @@
 <body>
     <div class="game-container">
         <div class="header">
-            <h1 class="title">🔢 jogo de multiplicação</h1>
-            <p class="subtitle">Pratique multiplicação de forma divertida!</p>
+            <h1 class="title">🔢 Desafio de Multiplicação</h1>
+            <p class="subtitle">10 perguntas • Cronômetro • Multiplique rapidamente!</p>
         </div>
 
-        <div class="score-board">
-            <div class="score-item">
-                <div class="score-label">Pontuação</div>
-                <div class="score-value" id="score">0</div>
+        <div class="game-info">
+            <div class="info-item">
+                <div class="info-label">Pergunta</div>
+                <div class="info-value" id="questionNumber">0/10</div>
             </div>
-            <div class="score-item">
-                <div class="score-label">Acertos</div>
-                <div class="score-value" id="correct">0</div>
+            <div class="info-item">
+                <div class="info-label">Pontuação</div>
+                <div class="info-value" id="score">0</div>
             </div>
-            <div class="score-item">
-                <div class="score-label">Erros</div>
-                <div class="score-value" id="incorrect">0</div>
+            <div class="info-item">
+                <div class="info-label">Acertos</div>
+                <div class="info-value" id="correct">0</div>
             </div>
-            <div class="score-item">
-                <div class="score-label">Sequência</div>
-                <div class="score-value" id="streak">0</div>
+            <div class="info-item">
+                <div class="info-label">Tempo</div>
+                <div class="info-value timer" id="timer">0:00</div>
             </div>
         </div>
 
-        <div class="difficulty-selector">
-            <div class="difficulty-label">Nível de Dificuldade:</div>
-            <button class="button difficulty-btn" onclick="setDifficulty('easy')">Fácil (2-12)</button>
-            <button class="button difficulty-btn" onclick="setDifficulty('medium')">Médio (3-25)</button>
-            <button class="button difficulty-btn" onclick="setDifficulty('hard')">Difícil (6-50)</button>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width: 0%"></div>
         </div>
 
-        <div class="question-container">
-            <div class="question" id="question">Escolha o nível de dificuldade para começar!</div>
+        <div class="difficulty-selector" id="difficultySelector">
+            <div class="difficulty-label">Escolha o Nível de Dificuldade:</div>
+            <button class="button difficulty-btn" onclick="startGame('expert')">Expert (12-99)</button>
+            <button class="button difficulty-btn" onclick="startGame('insane')">Insano (25-199)</button>
+            <button class="button difficulty-btn" onclick="startGame('nightmare')">Pesadelo (50-999)</button>
         </div>
 
-        <div class="input-container">
-            <input type="number" class="answer-input" id="answerInput" placeholder="?" disabled>
+        <div class="question-container" id="questionContainer" style="display: none;">
+            <div class="question" id="question"></div>
         </div>
 
-        <div>
-            <button class="button submit-btn" id="submitBtn" onclick="checkAnswer()" disabled>Verificar Resposta</button>
-            <button class="button next-btn hidden" id="nextBtn" onclick="nextQuestion()">Próxima Pergunta</button>
+        <div class="input-container" id="inputContainer" style="display: none;">
+            <input type="number" class="answer-input" id="answerInput" placeholder="?">
         </div>
 
-        <div class="feedback" id="feedback"></div>
+        <div id="gameButtons" style="display: none;">
+            <button class="button submit-btn" id="submitBtn" onclick="checkAnswer()">Verificar</button>
+            <button class="button next-btn hidden" id="nextBtn" onclick="nextQuestion()">Próxima</button>
+        </div>
+
+        <div class="feedback" id="feedback">Selecione um nível de dificuldade para começar o desafio!</div>
+
+        <div class="game-over hidden" id="gameOver">
+            <h2 id="gameOverTitle">🎉 Parabéns!</h2>
+            <div class="final-score" id="finalScore"></div>
+            <button class="button restart-btn" onclick="restartGame()">Jogar Novamente</button>
+        </div>
     </div>
 
     <div class="celebration" id="celebration"></div>
@@ -368,46 +444,110 @@
         let currentQuestion = {};
         let score = 0;
         let correct = 0;
-        let incorrect = 0;
-        let streak = 0;
-        let maxStreak = 0;
-        let difficulty = 'medium';
+        let currentQuestionNumber = 0;
+        let totalQuestions = 10;
+        let difficulty = 'expert';
         let gameStarted = false;
+        let gameEnded = false;
+        let startTime = 0;
+        let timerInterval;
+        let questionStartTime = 0;
 
         const difficultySettings = {
-            easy: { min: 2, max: 12 },
-            medium: { min: 3, max: 25 },
-            hard: { min: 6, max: 50 }
+            expert: { 
+                min: 12, 
+                max: 99,
+                name: 'Expert',
+                timeBonus: 20
+            },
+            insane: { 
+                min: 25, 
+                max: 199,
+                name: 'Insano',
+                timeBonus: 30
+            },
+            nightmare: { 
+                min: 50, 
+                max: 999,
+                name: 'Pesadelo',
+                timeBonus: 50
+            }
         };
 
-        function setDifficulty(level) {
+        function startGame(level) {
             difficulty = level;
             gameStarted = true;
-            document.getElementById('answerInput').disabled = false;
-            document.getElementById('submitBtn').disabled = false;
+            gameEnded = false;
+            currentQuestionNumber = 0;
+            score = 0;
+            correct = 0;
+            startTime = Date.now();
+            
+            document.getElementById('difficultySelector').style.display = 'none';
+            document.getElementById('questionContainer').style.display = 'block';
+            document.getElementById('inputContainer').style.display = 'block';
+            document.getElementById('gameButtons').style.display = 'block';
+            document.getElementById('gameOver').classList.add('hidden');
+            
+            startTimer();
             generateQuestion();
         }
 
+        function startTimer() {
+            timerInterval = setInterval(() => {
+                if (!gameEnded) {
+                    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                    const minutes = Math.floor(elapsed / 60);
+                    const seconds = elapsed % 60;
+                    const timeStr = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    
+                    const timerEl = document.getElementById('timer');
+                    timerEl.textContent = timeStr;
+                    
+                    // Adiciona efeito de urgência após 2 minutos
+                    if (elapsed > 120) {
+                        timerEl.classList.add('warning');
+                    }
+                }
+            }, 1000);
+        }
+
         function generateQuestion() {
+            if (currentQuestionNumber >= totalQuestions) {
+                endGame();
+                return;
+            }
+
+            currentQuestionNumber++;
+            questionStartTime = Date.now();
+            
             const settings = difficultySettings[difficulty];
             
-            // Gera dois números aleatórios para multiplicação
-            let num1 = Math.floor(Math.random() * (settings.max - settings.min + 1)) + settings.min;
-            let num2 = Math.floor(Math.random() * (settings.max - settings.min + 1)) + settings.min;
+            let num1, num2;
             
-            // Para nível difícil, adiciona chance de números de 2 dígitos maiores
-            if (difficulty === 'hard') {
-                if (Math.random() < 0.4) {
-                    num1 = Math.floor(Math.random() * 41) + 10; // 10-50
-                    num2 = Math.floor(Math.random() * 21) + 6;  // 6-26
-                }
-            }
-            
-            // Para nível médio, adiciona chance de números maiores ocasionalmente
-            if (difficulty === 'medium') {
+            if (difficulty === 'expert') {
+                // Números de 12-99 com foco em multiplicações mais complexas
+                num1 = Math.floor(Math.random() * 88) + 12;
+                num2 = Math.floor(Math.random() * 88) + 12;
+            } else if (difficulty === 'insane') {
+                // Números de 25-199 com possibilidade de números maiores
+                num1 = Math.floor(Math.random() * 175) + 25;
+                num2 = Math.floor(Math.random() * 175) + 25;
+                
+                // 30% chance de números ainda maiores
                 if (Math.random() < 0.3) {
-                    num1 = Math.floor(Math.random() * 16) + 10; // 10-25
-                    num2 = Math.floor(Math.random() * 13) + 3;  // 3-15
+                    num1 = Math.floor(Math.random() * 100) + 100;
+                    num2 = Math.floor(Math.random() * 50) + 25;
+                }
+            } else if (difficulty === 'nightmare') {
+                // Números de 50-999 - muito difícil
+                num1 = Math.floor(Math.random() * 950) + 50;
+                num2 = Math.floor(Math.random() * 950) + 50;
+                
+                // 40% chance de números extremamente grandes
+                if (Math.random() < 0.4) {
+                    num1 = Math.floor(Math.random() * 500) + 500;
+                    num2 = Math.floor(Math.random() * 100) + 50;
                 }
             }
             
@@ -424,11 +564,14 @@
             document.getElementById('feedback').className = 'feedback';
             document.getElementById('submitBtn').classList.remove('hidden');
             document.getElementById('nextBtn').classList.add('hidden');
+            
+            updateUI();
         }
 
         function checkAnswer() {
             const userAnswer = parseInt(document.getElementById('answerInput').value);
             const feedbackEl = document.getElementById('feedback');
+            const questionTime = (Date.now() - questionStartTime) / 1000;
             
             if (isNaN(userAnswer)) {
                 feedbackEl.textContent = 'Por favor, digite um número!';
@@ -438,71 +581,56 @@
 
             if (userAnswer === currentQuestion.answer) {
                 correct++;
-                streak++;
-                score += (10 + streak * 2); // Pontuação bônus por sequência
-                maxStreak = Math.max(maxStreak, streak);
                 
-                feedbackEl.textContent = `🎉 Correto! ${currentQuestion.num1} × ${currentQuestion.num2} = ${currentQuestion.answer}`;
+                // Sistema de pontuação baseado em dificuldade e tempo
+                let basePoints = difficultySettings[difficulty].timeBonus;
+                let timeBonus = Math.max(0, Math.floor((10 - questionTime) * 5));
+                let difficultyMultiplier = difficulty === 'expert' ? 1 : difficulty === 'insane' ? 2 : 3;
+                
+                let questionScore = (basePoints + timeBonus) * difficultyMultiplier;
+                score += questionScore;
+                
+                feedbackEl.textContent = `🎉 Correto! +${questionScore} pontos (${questionTime.toFixed(1)}s)`;
                 feedbackEl.className = 'feedback correct';
                 
-                // Adiciona confete para acertos em sequência
-                if (streak >= 3) {
+                // Confete para respostas rápidas
+                if (questionTime < 5) {
                     createConfetti();
                 }
             } else {
-                incorrect++;
-                streak = 0;
-                
                 feedbackEl.textContent = `❌ Incorreto! ${currentQuestion.num1} × ${currentQuestion.num2} = ${currentQuestion.answer}`;
                 feedbackEl.className = 'feedback incorrect';
             }
 
-            updateScores();
             document.getElementById('submitBtn').classList.add('hidden');
             document.getElementById('nextBtn').classList.remove('hidden');
+            updateUI();
         }
 
         function nextQuestion() {
             generateQuestion();
         }
 
-        function updateScores() {
+        function updateUI() {
+            document.getElementById('questionNumber').textContent = `${currentQuestionNumber}/10`;
             document.getElementById('score').textContent = score;
             document.getElementById('correct').textContent = correct;
-            document.getElementById('incorrect').textContent = incorrect;
-            document.getElementById('streak').textContent = streak;
-        }
-
-        function createConfetti() {
-            const celebration = document.getElementById('celebration');
-            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd'];
             
-            for (let i = 0; i < 50; i++) {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-                confetti.style.left = Math.random() * 100 + '%';
-                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
-                confetti.style.animationDelay = Math.random() * 3 + 's';
-                confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
-                celebration.appendChild(confetti);
-                
-                setTimeout(() => {
-                    confetti.remove();
-                }, 5000);
-            }
+            const progress = (currentQuestionNumber / totalQuestions) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
         }
 
-        // Event listeners
-        document.getElementById('answerInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && !document.getElementById('submitBtn').classList.contains('hidden')) {
-                checkAnswer();
-            } else if (e.key === 'Enter' && !document.getElementById('nextBtn').classList.contains('hidden')) {
-                nextQuestion();
-            }
-        });
-
-        // Inicialização
-        document.getElementById('feedback').textContent = 'Selecione um nível de dificuldade para começar a jogar!';
-    </script>
-</body>
-</html>
+        function endGame() {
+            gameEnded = true;
+            clearInterval(timerInterval);
+            
+            const totalTime = Math.floor((Date.now() - startTime) / 1000);
+            const minutes = Math.floor(totalTime / 60);
+            const seconds = totalTime % 60;
+            
+            document.getElementById('questionContainer').style.display = 'none';
+            document.getElementById('inputContainer').style.display = 'none';
+            document.getElementById('gameButtons').style.display = 'none';
+            
+            const gameOverEl = document.getElementById('gameOver');
+            const titleEl = document.getElement
